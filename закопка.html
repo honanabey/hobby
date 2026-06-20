@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Закопка · таблица 3×3</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #f7f3ff 0%, #e8e0f5 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        .card {
+            max-width: 750px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 2.5rem;
+            padding: 2rem 1.8rem 2.5rem;
+            box-shadow: 0 25px 45px -12px rgba(60, 30, 80, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.2s ease;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #2d1b3d;
+            text-align: center;
+            margin-bottom: 1.2rem;
+            text-shadow: 0 4px 12px rgba(110, 60, 140, 0.15);
+            word-break: break-word;
+        }
+        h1 small {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.6;
+            display: block;
+            margin-top: -0.3rem;
+            letter-spacing: 0.2px;
+        }
+        .table-wrapper {
+            background: rgba(255, 245, 255, 0.5);
+            border-radius: 2rem;
+            padding: 0.5rem;
+            box-shadow: inset 0 2px 6px rgba(90, 50, 120, 0.08);
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 12px;
+            table-layout: fixed;
+        }
+        td {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 0.5rem;
+            box-shadow: 0 8px 18px -6px rgba(70, 40, 100, 0.15), 0 0 0 1px rgba(200, 170, 230, 0.3);
+            transition: box-shadow 0.15s;
+            height: 100px;
+            vertical-align: top;
+        }
+        td:focus-within {
+            box-shadow: 0 8px 22px -4px #a07bc0, 0 0 0 2px #b492d0;
+        }
+        textarea {
+            width: 100%;
+            height: 100%;
+            min-height: 80px;
+            border: none;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.5;
+            padding: 0.7rem 0.6rem;
+            background: transparent;
+            border-radius: 1rem;
+            color: #1f142b;
+            font-weight: 450;
+            letter-spacing: 0.01em;
+            transition: background 0.1s;
+            outline: none;
+        }
+        textarea::placeholder {
+            color: #b8a6cc;
+            font-weight: 300;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        textarea:focus {
+            background: rgba(230, 215, 245, 0.15);
+        }
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem 1.5rem;
+            margin-top: 1.8rem;
+            padding: 0 0.2rem;
+        }
+        .save-btn {
+            background: #2d1b3d;
+            border: none;
+            padding: 0.9rem 2.4rem;
+            border-radius: 3rem;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 8px 18px -6px #36224a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #4d2f66;
+            letter-spacing: 0.3px;
+        }
+        .save-btn:hover {
+            background: #3f2955;
+            transform: scale(0.97);
+            box-shadow: 0 4px 12px -4px #2d1b3d;
+        }
+        .save-btn:active {
+            transform: scale(0.94);
+            background: #22152e;
+        }
+        .save-btn i {
+            font-style: normal;
+            font-size: 1.3rem;
+            line-height: 1;
+        }
+        .toast-message {
+            font-size: 0.95rem;
+            color: #3a2a48;
+            background: rgba(235, 220, 250, 0.8);
+            padding: 0.5rem 1.2rem;
+            border-radius: 3rem;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(200, 170, 230, 0.5);
+            font-weight: 450;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            pointer-events: none;
+        }
+        .toast-message.show {
+            opacity: 1;
+        }
+        .clear-hint {
+            color: #6f5585;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.4);
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            border: 1px dashed #b79acf;
+            backdrop-filter: blur(2px);
+        }
+        @media (max-width: 550px) {
+            .card { padding: 1.5rem 1rem; }
+            h1 { font-size: 2.4rem; }
+            td { height: 80px; }
+            textarea { min-height: 70px; font-size: 0.95rem; }
+            .action-bar { flex-direction: column-reverse; align-items: stretch; }
+            .save-btn { justify-content: center; }
+            .toast-message { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>
+            Закопка
+            <small>Запиши свои хобби и найди людей с такими же увлечениями</small>
+        </h1>
+
+        <div class="table-wrapper">
+            <table id="memoryTable">
+                <tbody>
+                    <tr>
+                        <td><textarea placeholder="введите текст…" data-cell="0,0"></textarea></td>
+                        <td><textarea placeholder="введите текст…" data-cell="0,1"></textarea></td>
+                        <td><textarea placeholder="введите текст…" data-cell="0,2"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td><textarea placeholder="введите текст…" data-cell="1,0"></textarea></td>
+                        <td><textarea placeholder="введите текст…" data-cell="1,1"></textarea></td>
+                        <td><textarea placeholder="введите текст…" data-cell="1,2"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td><textarea placeholder="введите текст…" data-cell="2,0"></textarea></td>
+                        <td><textarea placeholder="введите текст…" data-cell="2,1"></textarea></td>
+                        <td><textarea placeholder="введите текст…" data-cell="2,2"></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="action-bar">
+            <span class="toast-message" id="toastMsg">✔️ сохранено</span>
+            <button class="save-btn" id="saveButton">
+                <i>💾</i> Сохранить
+            </button>
+        </div>
+        <div style="text-align: right; margin-top: 0.3rem; padding-right: 0.3rem;">
+            <span class="clear-hint">✎  данные хранятся в localStorage</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- Инициализация ----------
+            const table = document.getElementById('memoryTable');
+            const textareas = table.querySelectorAll('textarea');
+            const saveBtn = document.getElementById('saveButton');
+            const toast = document.getElementById('toastMsg');
+
+            // Ключ для localStorage
+            const STORAGE_KEY = 'znakomka_grid_3x3';
+
+            // ---------- Загрузка сохранённых данных ----------
+            function loadFromStorage() {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (!stored) return false;
+
+                try {
+                    const data = JSON.parse(stored);
+                    // data ожидается как объект { "0,0": "текст", "0,1": "текст", ... }
+                    if (typeof data !== 'object' || data === null) return false;
+
+                    let loadedCount = 0;
+                    textareas.forEach(ta => {
+                        const cellKey = ta.dataset.cell;
+                        if (cellKey && data.hasOwnProperty(cellKey)) {
+                            const value = data[cellKey];
+                            if (typeof value === 'string') {
+                                ta.value = value;
+                                loadedCount++;
+                            }
+                        }
+                    });
+                    return loadedCount > 0;
+                } catch (e) {
+                    console.warn('Ошибка парсинга сохранённых данных:', e);
+                    return false;
+                }
+            }
+
+            // ---------- Сохранение (сбор данных) ----------
+            function saveToStorage() {
+                const gridData = {};
+                textareas.forEach(ta => {
+                    const cellKey = ta.dataset.cell;
+                    if (cellKey) {
+                        gridData[cellKey] = ta.value;
+                    }
+                });
+
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(gridData));
+                    return true;
+                } catch (e) {
+                    console.error('Ошибка сохранения в localStorage:', e);
+                    return false;
+                }
+            }
+
+            // ---------- Показать уведомление "сохранено" ----------
+            function showToast(message = '✔️ сохранено', duration = 2200) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                clearTimeout(window.toastTimer);
+                window.toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, duration);
+            }
+
+            // ---------- Обработчик сохранения (с визуальной обратной связью) ----------
+            function handleSave() {
+                const success = saveToStorage();
+                if (success) {
+                    showToast('💾 сохранено', 2000);
+                } else {
+                    showToast('⚠️ ошибка сохранения', 2200);
+                }
+            }
+
+            // ---------- Загружаем данные при старте ----------
+            const hasLoaded = loadFromStorage();
+
+            // если ничего не загрузилось — можно показать подсказку (но не обязательно)
+            if (!hasLoaded) {
+                // Заполним ячейки примером (но не перезаписываем если что-то было)
+                // Проверим, пустые ли все поля (чтобы не затереть пользовательские данные)
+                let allEmpty = true;
+                textareas.forEach(ta => {
+                    if (ta.value.trim() !== '') allEmpty = false;
+                });
+                if (allEmpty) {
+                    // примеры для наглядности
+                    const demo = [
+                        ['Хобби 1', 'Хобби 2', 'Хобби 3'],
+                        ['Имя', 'Имя', 'Имя'],
+                        ['Имя', 'Имя', 'Имя']
+                    ];
+                    textareas.forEach(ta => {
+                        const [row, col] = ta.dataset.cell.split(',').map(Number);
+                        if (!isNaN(row) && !isNaN(col) && demo[row] && demo[row][col] !== undefined) {
+                            ta.value = demo[row][col];
+                        }
+                    });
+                    // Сохраним демо-данные, чтобы они не пропали
+                    saveToStorage();
+                }
+            }
+
+            // ---------- События ----------
+            saveBtn.addEventListener('click', handleSave);
+
+            // Бонус: автосохранение при изменении текста (опционально, но по запросу — только кнопка)
+            // Но по желанию можно включить автосохранение, однако условие "с помощью кнопки сохранить"
+            // выполнено.  Добавим "быстрое сохранение" по Ctrl+S (защита от нативного)
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault(); // отменяем сохранение страницы
+                    handleSave();
+                }
+            });
+
+            // Также сохраняем при потере фокуса с задержкой? 
+            // Но по заданию — кнопка, поэтому оставляем только кнопку + Ctrl+S как доп.
+
+            // ---------- Дополнительно: индикация, что данные сохраняются ----------
+            // При загрузке покажем краткое уведомление, если данные загружены
+            if (hasLoaded) {
+                // показываем уведомление на секунду, что данные восстановлены
+                setTimeout(() => {
+                    showToast('📂 данные загружены', 1500);
+                }, 200);
+            } else {
+                // если не было данных, но мы поставили демо, покажем подсказку
+                setTimeout(() => {
+                    showToast('✏️ напиши что-нибудь', 1800);
+                }, 300);
+            }
+
+            // Небольшая "фича": если в ячейке пусто, но пользователь кликнул — 
+            // можно убрать placeholder, он сам исчезнет при вводе.
+
+            console.log('✨ Знакомка · таблица 3×3 готова');
+        })();
+    </script>
+</body>
+</html>
